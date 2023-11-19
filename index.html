@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT-like Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #chat-messages {
+            padding: 10px;
+            overflow-y: scroll;
+            max-height: 300px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+        }
+
+        #user-input-container {
+            display: flex;
+            padding: 10px;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 5px;
+        }
+
+        button {
+            padding: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div id="chat-messages"></div>
+    <div id="user-input-container">
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    function sendMessage() {
+        var userInput = document.getElementById('user-input').value;
+        appendMessage('user', userInput);
+
+        // Send user input to the server
+        $.ajax({
+            type: 'POST',
+            url: '/get_response',
+            data: { user_input: userInput },
+            success: function (data) {
+                var chatbotResponse = data.response;
+                appendMessage('chatbot', chatbotResponse);
+            }
+        });
+
+        // Clear user input field
+        document.getElementById('user-input').value = '';
+    }
+
+    function appendMessage(sender, message) {
+        var messagesContainer = document.getElementById('chat-messages');
+        var messageElement = document.createElement('div');
+        messageElement.className = 'message';
+        messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        messagesContainer.appendChild(messageElement);
+
+        // Scroll to the bottom of the chat container
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
